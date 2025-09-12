@@ -1,0 +1,9 @@
+_pycache_
+_build_
+_dist_
+_docs_
+_env_
+_logs_
+_tests_
+_venv_
+_wheels_

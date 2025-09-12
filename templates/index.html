@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Healthcare Chatbot</title>
+  <style>
+    body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #dbeafe, #fce7f3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#chatbox {
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  padding: 15px;
+  width: 600px;      /* ⬅️ wider */
+  height: 500px;     /* ⬅️ taller */
+  overflow-y: auto;
+  margin: 0 auto 10px auto;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  scroll-behavior: smooth;
+}
+
+.message {
+  margin: 10px 0;
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  line-height: 1.5;
+  clear: both;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.3s forwards;
+  word-wrap: break-word;
+  font-size: 15px;   /* ⬅️ slightly bigger text */
+}
+
+.user {
+  background: #007bff;
+  color: #fff;
+  float: right;
+  text-align: right;
+  border-radius: 18px 18px 0 18px;
+}
+
+.bot {
+  background: #f1f0f0;
+  color: #000;
+  float: left;
+  border-radius: 18px 18px 18px 0;
+}
+
+#input-area {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 600px;   /* match chatbox width */
+}
+
+#userInput {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.typing {
+  font-style: italic;
+  color: gray;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  </style>
+  <!-- ✅ Markdown parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <h2>💬 MedBot</h2>
+
+    <div id="chatbox"></div>
+    
+    <div id="input-area">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+    
+    <script>
+    function sendMessage() {
+        let userMessage = document.getElementById("userInput").value.trim();
+        if (!userMessage) return;
+
+        let chatbox = document.getElementById("chatbox");
+    
+        // show user message
+        chatbox.innerHTML += `<div class="message user">${userMessage}</div>`;
+
+        // show typing indicator
+        let typingDiv = document.createElement("div");
+        typingDiv.className = "message bot typing";
+        typingDiv.textContent = "MedBot is typing...";
+        chatbox.appendChild(typingDiv);
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // send message to Flask backend
+        fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMessage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // remove typing indicator
+            typingDiv.remove();
+
+            // show bot reply (✅ Markdown parsed into clean HTML)
+            let botMsg = document.createElement("div");
+            botMsg.className = "message bot";
+            botMsg.innerHTML = marked.parse(data.response);
+            chatbox.appendChild(botMsg);
+
+            chatbox.scrollTop = chatbox.scrollHeight;
+        })
+        .catch(error => {
+            typingDiv.remove();
+            chatbox.innerHTML += `<div class="message bot">⚠️ Error connecting to server</div>`;
+        });
+    
+        document.getElementById("userInput").value = "";
+    }
+
+    // ✅ Enter key support
+    document.getElementById("userInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
+    </script>
+    
+</body>
+</html>
