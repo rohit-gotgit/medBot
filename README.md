@@ -3,7 +3,7 @@
 <img src="https://www.scnsoft.com/blog-pictures/healthcare/how-chatbots-and-ai-are-changing-the-healthcare-industry_1.png">
 
 **MedBot** is a lightweight rule-based medical assistance chatbot designed to help users get quick responses to common health-related questions.  
-It acts as an early-stage virtual healthcare assistant that guides users through symptoms, basic medical information, and suggested next s
+It acts as an early-stage virtual healthcare assistant that guides users through symptoms, basic medical information, and suggested next steps.
 
 ---
 
